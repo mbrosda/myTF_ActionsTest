@@ -52,11 +52,13 @@ jobs:
       - name: Terraform Show Plan
         run: terraform show plan.${{ env.PlanID }}.bin
 
-      - name: Store Plan as artifact
+      - name: Store Plan and providers as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: Terraform-Plan
-          path: plan.${{ env.PlanID }}.bin
+          name: Terraform-Artifacts
+          path: |
+            plan.${{ env.PlanID }}.bin
+            .terraform/providers/
 
   #---------------------------------------------------------------------------------------------------------
   # wait for approval (required for environment "deploy"), then perform tf apply
@@ -73,6 +75,13 @@ jobs:
       #---------------
       # initialize job
       #---------------
+      - name: Cache Repo
+        id: cache-repo
+        uses: actions/cache@v3
+        with:
+          path: .
+          key: repo-cache
+
       - uses: actions/checkout@v2
 
       - name: Setup Terraform
@@ -86,7 +95,7 @@ jobs:
       #--------------------------------------------------------------
       - uses: actions/download-artifact@v3
         with:
-          name: Terraform-Plan
+          name: Terraform-Artifacts
 
       - name: Terraform Apply
         run: terraform apply --auto-approve
