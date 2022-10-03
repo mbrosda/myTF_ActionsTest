@@ -32,6 +32,9 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=plan.${{ env.PlanID }}.bin
 
+      - name: Terraform Show Plan
+        run: terraform show plan.${{ env.PlanID }}.bin
+
       - name: Store Plan as artifact
         uses: actions/upload-artifact@v2
         with:
@@ -62,11 +65,8 @@ jobs:
         with:
           name: Terraform-Plan
 
-      - name: Terraform Show Plan
-        run: terraform show plan.${{ env.PlanID }}.bin
-
 #      - name: Terraform Apply
 #        run: terraform apply --auto-approve
 
       - name: Git Status
-        run: git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push
+        run: (git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push); true
