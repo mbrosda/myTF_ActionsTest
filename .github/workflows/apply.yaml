@@ -33,7 +33,7 @@ jobs:
           curl -X DELETE \
                -H "Accept: application/vnd.github.v3+json" \
                -H "Authorization: token ${{ github.token }}" \
-               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/cache-repo"
+               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/1"
       
       - name: List Caches
         run: |
