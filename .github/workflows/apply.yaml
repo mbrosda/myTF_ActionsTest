@@ -35,4 +35,4 @@ jobs:
         run: terraform apply --auto-approve
 
       - name: Git Status
-        run: git status
+        run: git status ; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push
