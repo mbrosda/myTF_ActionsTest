@@ -1,6 +1,6 @@
 name: Terraform Validate, Plan, Apply
 
-on: [workflow_dispatch]
+on: [workflow_dispatch,push]
 
 env:
   ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
@@ -87,16 +87,16 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: Terraform-Artifacts
+
       - name: Terraform Init
         run: terraform init
 
       #--------------------------------------------------------------
       # Download plan which was generated in previous job, then apply
       #--------------------------------------------------------------
-      - uses: actions/download-artifact@v3
-        with:
-          name: Terraform-Artifacts
-
       - name: Terraform Apply
         run: terraform apply --auto-approve
 
