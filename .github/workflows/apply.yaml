@@ -26,6 +26,14 @@ jobs:
       #---------------
       
       # see https://stackoverflow.com/questions/63521430/clear-cache-in-github-actions
+
+
+      - name: Delete Caches
+        run: curl -X DELETE \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  -H "Authorization: token <TOKEN>" \
+                  https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/cache-repo
+      
       - name: List Caches
         run: |
           curl -H 'Accept: application/vnd.github.v3+json' \
@@ -33,7 +41,7 @@ jobs:
                "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches"
 
       - name: Cache Repo
-        #id: cache-repo
+        id: cache-repo
         uses: actions/cache@v3
         with:
           path: .
