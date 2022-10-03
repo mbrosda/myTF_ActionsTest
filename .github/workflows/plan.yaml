@@ -23,7 +23,10 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        run: terraform init -migrate-state -reconfigure
+        run: terraform init -reconfigure
+
+      - name: Terraform Init
+        run: terraform init -migrate-state
 
       - name: Terraform Validate
         run: terraform validate
