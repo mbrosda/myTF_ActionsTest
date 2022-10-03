@@ -1,6 +1,6 @@
 name: Terraform Validate, Plan
 
-on: [workflow_dispatch, push]
+on: [workflow_dispatch]
 
 defaults:
   run:
