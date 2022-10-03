@@ -39,6 +39,7 @@ jobs:
           path: plan.${{ env.PlanID }}.bin
 
   terraform-apply:
+    needs: job1
     runs-on: ubuntu-latest
 
     env:
