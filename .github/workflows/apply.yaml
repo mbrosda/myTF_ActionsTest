@@ -7,7 +7,7 @@ defaults:
     working-directory: .
 
 jobs:
-  terraform:
+  terraform-plan:
     runs-on: ubuntu-latest
 
     env:
@@ -38,11 +38,34 @@ jobs:
           name: Terraform-Plan
           path: plan.${{ env.PlanID }}.bin
 
+  terraform-apply:
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
+      ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
+      ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
+      ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
+      PlanID: ${{ github.run_id }}-${{ github.run_number }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Terraform-Plan
+
       - name: Terraform Show Plan
         run: terraform show plan.${{ env.PlanID }}.bin
 
-      - name: Terraform Apply
-        run: terraform apply --auto-approve
+#      - name: Terraform Apply
+#        run: terraform apply --auto-approve
 
       - name: Git Status
         run: git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push
