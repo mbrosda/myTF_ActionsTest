@@ -75,8 +75,8 @@ jobs:
           path: |
             plan.${{ env.PlanID }}.bin
  
-#      - name: Remove Providers to not store them in cache
-#        run: rm -rf .terraform/providers/
+      - name: Remove obsolete files from cache (will be cleaned up anyway)
+        run: rm -rf plan.${{ env.PlanID }}.bin
 
   #---------------------------------------------------------------------------------------------------------
   # wait for approval (required for environment "deploy"), then perform tf apply
@@ -121,5 +121,5 @@ jobs:
 #      - name: Git Status
 #        run: (git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push); true
 
-      - name: Remove Providers from cache
-        run: rm -rf .terraform/providers/
+      - name: Remove obsolete files from cache (will be cleaned up anyway)
+        run: rm -rf plan.${{ env.PlanID }}.bin
