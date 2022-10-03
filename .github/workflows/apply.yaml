@@ -30,7 +30,7 @@ jobs:
 #        run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -o plan.${{ env.PlanID }}.bin
+        run: terraform plan -out=plan.${{ env.PlanID }}.bin
 
       - name: Terraform Show Plan
         run: terraform show plan.${{ env.PlanID }}.bin
