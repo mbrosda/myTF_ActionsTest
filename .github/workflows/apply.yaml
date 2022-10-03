@@ -44,6 +44,10 @@ jobs:
   terraform-apply:
     needs: terraform-plan
     runs-on: ubuntu-latest
+    environment: 
+      name: deploy
+      url: https://github.com
+
 
     env:
       ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
