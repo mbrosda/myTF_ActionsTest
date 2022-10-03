@@ -32,6 +32,12 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=plan.${{ env.PlanID }}.bin
 
+      - name: Store Plan as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Terraform-Plan
+          path: plan.${{ env.PlanID }}.bin
+
       - name: Terraform Show Plan
         run: terraform show plan.${{ env.PlanID }}.bin
 
