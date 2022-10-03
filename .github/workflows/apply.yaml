@@ -36,3 +36,6 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply --auto-approve
+
+      - name: Git Status
+        run: git status
