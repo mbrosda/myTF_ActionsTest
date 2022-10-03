@@ -25,21 +25,20 @@ jobs:
       # initialize job
       #---------------
       
-      # see https://stackoverflow.com/questions/63521430/clear-cache-in-github-actions
-
-
-      - name: Delete Caches
-        run: |
-          curl -X DELETE \
-               -H "Accept: application/vnd.github.v3+json" \
-               -H "Authorization: token ${{ github.token }}" \
-               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/1"
-      
-      - name: List Caches
-        run: |
-          curl -H 'Accept: application/vnd.github.v3+json' \
-               -H "Authorization: token ${{ github.token }}" \
-               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches"
+#      # see https://stackoverflow.com/questions/63521430/clear-cache-in-github-actions
+#
+#      - name: Delete Caches
+#        run: |
+#          curl -X DELETE \
+#               -H "Accept: application/vnd.github.v3+json" \
+#               -H "Authorization: token ${{ github.token }}" \
+#               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/1"
+#      
+#      - name: List Caches
+#        run: |
+#          curl -H 'Accept: application/vnd.github.v3+json' \
+#               -H "Authorization: token ${{ github.token }}" \
+#               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches"
 
       - name: Cache Repo
         id: cache-repo
@@ -75,10 +74,9 @@ jobs:
           name: Terraform-Artifacts
           path: |
             plan.${{ env.PlanID }}.bin
-            .terraform/providers/
-
-      - name: Remove Providers from cache
-        run: rm -rf .terraform/providers/
+ 
+#      - name: Remove Providers to not store them in cache
+#        run: rm -rf .terraform/providers/
 
   #---------------------------------------------------------------------------------------------------------
   # wait for approval (required for environment "deploy"), then perform tf apply
