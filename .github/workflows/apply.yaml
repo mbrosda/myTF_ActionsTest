@@ -25,14 +25,14 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
+#      - name: Terraform Validate
+#        run: terraform validate
 
-      - name: Terraform Plan
-        run: terraform plan
+#      - name: Terraform Plan
+#        run: terraform plan
 
       - name: Terraform Apply
         run: terraform apply --auto-approve
 
       - name: Git Status
-        run: git status ; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push
+        run: git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push
