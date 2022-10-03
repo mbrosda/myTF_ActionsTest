@@ -2,22 +2,28 @@ name: Terraform Validate, Plan, Apply
 
 on: [workflow_dispatch]
 
+env:
+  ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
+  ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
+  ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
+  ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
+  PlanID: ${{ github.run_id }}-${{ github.run_number }}
+
 defaults:
   run:
     working-directory: .
 
 jobs:
+  #---------------------------------------------------------------------------------------------------------
+  # perform TF plan only, then store plan as artifact
+  #---------------------------------------------------------------------------------------------------------
   terraform-plan:
     runs-on: ubuntu-latest
 
-    env:
-      ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
-      ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
-      ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
-      ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
-      PlanID: ${{ github.run_id }}-${{ github.run_number }}
-
     steps:
+      #---------------
+      # initialize job
+      #---------------
       - uses: actions/checkout@v2
 
       - name: Setup Terraform
@@ -25,6 +31,10 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+
+       #------------------------------------------------------------------------------
+       # perform terraform plan, show result and store plan as artifact (for next job)
+       #------------------------------------------------------------------------------
 
 #      - name: Terraform Validate
 #        run: terraform validate
@@ -41,22 +51,21 @@ jobs:
           name: Terraform-Plan
           path: plan.${{ env.PlanID }}.bin
 
+  #---------------------------------------------------------------------------------------------------------
+  # wait for approval (required for environment "deploy"), then perform tf apply
+  #---------------------------------------------------------------------------------------------------------
   terraform-apply:
     needs: terraform-plan
     runs-on: ubuntu-latest
-    environment: 
+
+    environment:
       name: deploy
       url: https://github.com
 
-
-    env:
-      ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
-      ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
-      ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
-      ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
-      PlanID: ${{ github.run_id }}-${{ github.run_number }}
-
     steps:
+      #---------------
+      # initialize job
+      #---------------
       - uses: actions/checkout@v2
 
       - name: Setup Terraform
@@ -65,12 +74,15 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      #--------------------------------------------------------------
+      # Download plan which was generated in previous job, then apply
+      #--------------------------------------------------------------
       - uses: actions/download-artifact@v3
         with:
           name: Terraform-Plan
 
-#      - name: Terraform Apply
-#        run: terraform apply --auto-approve
+      - name: Terraform Apply
+        run: terraform apply --auto-approve
 
-      - name: Git Status
-        run: (git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push); true
+#      - name: Git Status
+#        run: (git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push); true
