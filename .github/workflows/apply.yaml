@@ -30,10 +30,10 @@ jobs:
 #        run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -o plan.${{ PlanID }}.bin
+        run: terraform plan -o plan.${{ env.PlanID }}.bin
 
       - name: Terraform Show Plan
-        run: terraform show plan.${{ PlanID }}.bin
+        run: terraform show plan.${{ env.PlanID }}.bin
 
       - name: Terraform Apply
         run: terraform apply --auto-approve
