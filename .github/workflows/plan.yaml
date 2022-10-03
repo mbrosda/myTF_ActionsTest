@@ -30,3 +30,6 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan
+
+      - name: Git status
+        run: git status
