@@ -24,9 +24,13 @@ jobs:
       #---------------
       # initialize job
       #---------------
+      
+      # see https://stackoverflow.com/questions/63521430/clear-cache-in-github-actions
       - name: List Caches
-        # see https://stackoverflow.com/questions/63521430/clear-cache-in-github-actions
-        run: curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ github.token }}" "https://api.github.com/repos/mbrosda/myTF_ActionsTest/actions/caches"
+        run: |
+          curl -H 'Accept: application/vnd.github.v3+json' \
+               -H "Authorization: token ${{ github.token }}" \
+               "https://api.github.com/repos/mbrosda/myTF_ActionsTest/actions/caches"
 
       - name: Cache Repo
         #id: cache-repo
