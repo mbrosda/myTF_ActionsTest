@@ -21,6 +21,12 @@ jobs:
                -H "Authorization: Bearer ${{ github.token }}" \
                "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts"
 
+      - name: Delete Artifacts
+        uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ github.token }}
+          expire-in: 0days # Set this to 0 to delete all artifacts
+
       #-----------------------------------------------------------------------------------------------
       # manage caches - see https://stackoverflow.com/questions/63521430/clear-cache-in-github-actions
       #-----------------------------------------------------------------------------------------------
