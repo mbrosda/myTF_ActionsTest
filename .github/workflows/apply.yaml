@@ -1,4 +1,4 @@
-name: Terraform Validate, Plan, Apply
+name: Terraform Apply
 
 on: [workflow_dispatch]
 
@@ -83,6 +83,15 @@ jobs:
       #---------------
       # initialize job
       #---------------
+
+      #----------------------
+      # cancel other job runs
+      #----------------------
+      - uses: n1hility/cancel-previous-runs@v2
+        with: 
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: apply.yaml
+
       - name: display IDs
         run: |
           echo "RUN_ID:     ${{ github.run_id }}"
