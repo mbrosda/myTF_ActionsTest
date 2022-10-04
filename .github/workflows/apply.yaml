@@ -1,6 +1,6 @@
 name: Terraform Validate, Plan, Apply
 
-on: [workflow_dispatch,push]
+on: [workflow_dispatch]
 
 env:
   ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
