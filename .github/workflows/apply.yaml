@@ -90,6 +90,8 @@ jobs:
 
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action
+        with:
+          access_token: "${{ github.token }}"
 
 #      - uses: n1hility/cancel-previous-runs@v2
 #        with: 
