@@ -87,10 +87,14 @@ jobs:
       #----------------------
       # cancel other job runs
       #----------------------
-      - uses: n1hility/cancel-previous-runs@v2
-        with: 
-          token: "${{ github.token }}"
-          workflow: apply.yaml
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action
+
+#      - uses: n1hility/cancel-previous-runs@v2
+#        with: 
+#          token: "${{ github.token }}"
+#          workflow: apply.yaml
 
       - name: display IDs
         run: |
