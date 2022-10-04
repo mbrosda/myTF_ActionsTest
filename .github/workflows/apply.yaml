@@ -89,7 +89,7 @@ jobs:
       #----------------------
       - uses: n1hility/cancel-previous-runs@v2
         with: 
-          token: "${{ github.token }}""
+          token: "${{ github.token }}"
           workflow: apply.yaml
 
       - name: display IDs
