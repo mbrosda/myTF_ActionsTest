@@ -25,6 +25,11 @@ jobs:
       # initialize job
       #---------------
 
+      - name: display IDs
+        run: |
+          echo "RUN_ID:     ${{ github.run_id }}"
+          echo "RUN_NUMBER: ${{ github.run_number }}"
+
       - name: Cache Repo
         id: cache-repo
         uses: actions/cache@v3
@@ -78,6 +83,11 @@ jobs:
       #---------------
       # initialize job
       #---------------
+      - name: display IDs
+        run: |
+          echo "RUN_ID:     ${{ github.run_id }}"
+          echo "RUN_NUMBER: ${{ github.run_number }}"
+
       - name: Cache Repo
         id: cache-repo
         uses: actions/cache@v3
