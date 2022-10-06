@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: print GITHUB_REF_NAME
-        run: echo $GITHUB_REF_NAME
+        run: echo '${{ env.GITHUB_REF_NAME }}'
 
 #            select(.head_branch =="$GITHUB_REF_NAME")               | 
 
