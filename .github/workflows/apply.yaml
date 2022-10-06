@@ -48,7 +48,7 @@ jobs:
         uses: styfle/cancel-workflow-action@0.10.1
         with:
           access_token: "${{ github.token }}"
-          workflow_id: "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
+          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
 
 
       #---------------
