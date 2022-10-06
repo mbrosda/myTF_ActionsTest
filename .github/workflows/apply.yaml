@@ -37,12 +37,16 @@ jobs:
             select(.status      =="waiting")                        | 
             select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
             select(.head_branch =="${{ env.BranchName }}")          | 
-            .workflow_id] | unique | join (",")') ; \
+            .id] | unique | join (" ")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
       - name: Print IDs of previous runs
         if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
-        run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
+        run: |
+          for ID in ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
+          do
+            echo $ID
+          done
 
 #      - name: Cancel Previous Runs
 #        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
