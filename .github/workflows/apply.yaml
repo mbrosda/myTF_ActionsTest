@@ -10,7 +10,7 @@ env:
   PlanID:              ${{ github.run_id }}-${{ github.run_number }}
   GITHUB_API_PREFIX:  "https://api.github.com/repos/mbrosda/myTF_ActionsTest"
   THIS_WORKFLOW_YAML: ".github/workflows/apply.yaml"
-  BranchName:         "main"
+  BranchName:         "${{ github.ref_name }}"
 
 defaults:
   run:
