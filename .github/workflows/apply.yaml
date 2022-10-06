@@ -31,7 +31,7 @@ jobs:
           echo "::set-output name=RUN_IDs::$runids"
 
       - name: Print IDs of previous runs
-        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != "" }}
+        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
         run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
 
       #---------------
