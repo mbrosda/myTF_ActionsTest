@@ -51,7 +51,8 @@ jobs:
           ignore_sha: true
           #workflow_id: 3199484560
           #all_but_latest: true
-          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
+          #workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
+          workflow_id: all                                                # will cancel all the workflows running in the branch
 
 
       #---------------
