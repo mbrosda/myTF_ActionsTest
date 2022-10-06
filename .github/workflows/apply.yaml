@@ -10,6 +10,7 @@ env:
   PlanID:              ${{ github.run_id }}-${{ github.run_number }}
   GITHUB_API_PREFIX:  "https://api.github.com/repos/mbrosda/myTF_ActionsTest"
   THIS_WORKFLOW_YAML: ".github/workflows/apply.yaml"
+  BranchName:         "main"
 
 defaults:
   run:
@@ -35,7 +36,7 @@ jobs:
           jq -r '[.workflow_runs[]                                  | 
             select(.status      =="waiting")                        | 
             select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
-            select(.head_branch =="${{ env.GITHUB_REF_NAME }}")     | 
+            select(.head_branch =="${{ env.BranchName }}")          | 
             .id] | join (",")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
