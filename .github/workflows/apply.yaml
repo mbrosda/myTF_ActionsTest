@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: print GITHUB_REF_NAME
+        run: echo $GITHUB_REF_NAME
+        
       - name: Get IDs of previous runs
         id: previous-runs-ids
         run: |
