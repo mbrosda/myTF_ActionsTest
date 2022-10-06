@@ -37,7 +37,7 @@ jobs:
             select(.status      =="waiting")                        | 
             select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
             select(.head_branch =="${{ env.BranchName }}")          | 
-            .workflow_id] | join (",")') ; \
+            .workflow_id] | unique | join (",")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
       - name: Print IDs of previous runs
