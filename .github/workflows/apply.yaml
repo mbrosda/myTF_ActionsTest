@@ -3,129 +3,85 @@ name: Terraform Apply
 on: [workflow_dispatch,push]
 
 env:
-  ARM_CLIENT_ID:       ${{secrets.ARM_CLIENT_ID}}
-  ARM_CLIENT_SECRET:   ${{secrets.ARM_CLIENT_SECRET}}
-  ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
-  ARM_TENANT_ID:       ${{secrets.ARM_TENANT_ID}}
-  PlanID:              ${{ github.run_id }}-${{ github.run_number }}
-  GITHUB_API_PREFIX:  "https://api.github.com/repos/mbrosda/myTF_ActionsTest"
-  THIS_WORKFLOW_YAML: ".github/workflows/apply.yaml"
-  BranchName:         "${{ github.ref_name }}"
+  ARM_CLIENT_ID:       "${{secrets.ARM_CLIENT_ID}}"
+  ARM_CLIENT_SECRET:   "${{secrets.ARM_CLIENT_SECRET}}"
+  ARM_SUBSCRIPTION_ID: "${{secrets.ARM_SUBSCRIPTION_ID}}"
+  ARM_TENANT_ID:       "${{secrets.ARM_TENANT_ID}}"
+  PlanID:              "${{ github.run_id }}-${{ github.run_number }}"
+  GITHUB_API_PREFIX:   "https://api.github.com/repos/mbrosda/myTF_ActionsTest"
+  THIS_WORKFLOW_YAML:  ".github/workflows/apply.yaml"
+  BranchName:          "${{ github.ref_name }}"
 
 defaults:
   run:
     working-directory: .
 
 jobs:
-  #---------------------------------------------------------------------------------------------------------
+  ##########################################################################################################
   # perform TF plan only, then store plan as artifact
-  #---------------------------------------------------------------------------------------------------------
+  ##########################################################################################################
   terraform-plan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: print GITHUB_REF_NAME
-        run: echo '${{ env.GITHUB_REF_NAME }}'
+      #---------------
+      # initialize job
+      #---------------
 
-#            select(.head_branch =="$GITHUB_REF_NAME")               | 
-
-      - name: Get IDs of previous runs
-        id: previous-runs-ids
+      - name: display RUN IDs
         run: |
-          runids=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}"  ${{ env.GITHUB_API_PREFIX }}/actions/runs | \
-          jq -r '[.workflow_runs[]                                  | 
-            select(.status      =="waiting")                        | 
-            select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
-            select(.head_branch =="${{ env.BranchName }}")          | 
-            .id] | unique | join (" ")') ; \
-          echo "::set-output name=RUN_IDs::$runids"
+          echo "RUN_ID:     ${{ github.run_id }}"
+          echo "RUN_NUMBER: ${{ github.run_number }}"
 
-      - name: Print IDs of previous runs
-        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
-        run: |
-          for ID in ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
-          do
-            echo $ID
-          done
+      - name: Cache Repo
+        id: cache-repo
+        uses: actions/cache@v3
+        with:
+          path: .
+          key: repo-cache
 
-      - name: Cancel previous runs
-        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
-        run: |
-          for ID in ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
-          do
-            echo "Cancelling $ID ..."
-            curl -s -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" ${{ env.GITHUB_API_PREFIX }}/actions/runs/${ID}/cancel
-          done
+      #------------------------------------------------
+      # checkout code and prepare terraform-environment
+      #------------------------------------------------
 
+      - uses: actions/checkout@v2
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
+      - name: Terraform Init
+        run: terraform init
 
+       #---------------------------------------
+       # perform terraform plan and show result
+       #---------------------------------------
 
+       # - name: Terraform Validate
+       #   run: terraform validate
 
-#      - name: Cancel Previous Runs
-#        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
-#        uses: styfle/cancel-workflow-action@0.10.1
-#        with:
-#          access_token: "${{ github.token }}"
-#          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}    # is the ID which relates to the workflow (e.g. 36437411 for .github/workflows/apply.yaml)
-#                                                                         # all (previous) workflow RUNs with this workflow ID will be cancelled
-#
-#          #workflow_id: all                                              # will cancel all the workflows running in the branch
-#          #ignore_sha: true
-#          #all_but_latest: true
-#
+      - name: Terraform Plan
+        run: terraform plan -out=plan.${{ env.PlanID }}.bin
 
+      - name: Terraform Show Plan
+        run: terraform show plan.${{ env.PlanID }}.bin
 
-#      #---------------
-#      # initialize job
-#      #---------------
-#
-#      - name: display IDs
-#        run: |
-#          echo "RUN_ID:     ${{ github.run_id }}"
-#          echo "RUN_NUMBER: ${{ github.run_number }}"
-#
-#      - name: Cache Repo
-#        id: cache-repo
-#        uses: actions/cache@v3
-#        with:
-#          path: .
-#          key: repo-cache
-#
-#      - uses: actions/checkout@v2
-#
-#      - name: Setup Terraform
-#        uses: hashicorp/setup-terraform@v1
-#
-#      - name: Terraform Init
-#        run: terraform init
-#
-#       #------------------------------------------------------------------------------
-#       # perform terraform plan, show result and store plan as artifact (for next job)
-#       #------------------------------------------------------------------------------
-#
-##      - name: Terraform Validate
-##        run: terraform validate
-#
-#      - name: Terraform Plan
-#        run: terraform plan -out=plan.${{ env.PlanID }}.bin
-#
-#      - name: Terraform Show Plan
-#        run: terraform show plan.${{ env.PlanID }}.bin
-#
-#      - name: Store Plan and providers as artifact
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: Terraform-Artifacts
-#          path: |
-#            plan.${{ env.PlanID }}.bin
-# 
-#      - name: Remove obsolete files from cache (will be cleaned up anyway)
-#        run: rm -rf plan.${{ env.PlanID }}.bin
+      #-------------------------------
+      # save plan as artifact, cleanup
+      #-------------------------------
 
-  #---------------------------------------------------------------------------------------------------------
+      - name: Store Plan and providers as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Terraform-Artifacts
+          path: |
+            plan.${{ env.PlanID }}.bin
+ 
+      - name: Remove obsolete files from cache (will be cleaned up anyway)
+        run: rm -rf plan.${{ env.PlanID }}.bin
+
+  ##########################################################################################################
   # wait for approval (required for environment "deploy"), then perform tf apply
-  #---------------------------------------------------------------------------------------------------------
+  ##########################################################################################################
   terraform-apply:
     needs: terraform-plan
     runs-on: ubuntu-latest
@@ -139,22 +95,7 @@ jobs:
       # initialize job
       #---------------
 
-      #----------------------
-      # cancel other job runs
-      #----------------------
-
-
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.10.1
-        with:
-          access_token: "${{ github.token }}"
-
-#      - uses: n1hility/cancel-previous-runs@v2
-#        with: 
-#          token: "${{ github.token }}"
-#          workflow: apply.yaml
-
-      - name: display IDs
+      - name: display RUN IDs
         run: |
           echo "RUN_ID:     ${{ github.run_id }}"
           echo "RUN_NUMBER: ${{ github.run_number }}"
@@ -165,6 +106,36 @@ jobs:
         with:
           path: .
           key: repo-cache
+
+      #-----------------------------------------------------------------------------------------------
+      # cancel other job runs to prevent old (not yet approved) plans to be applied later
+      # selecting the right workflow run gives more control and flexibility than other solutions, e.g.
+      # styfle/cancel-workflow-action@0.10.1 or n1hility/cancel-previous-runs@v2
+      #-----------------------------------------------------------------------------------------------
+
+      - name: Get IDs of previous runs
+        id: previous-runs-ids
+        run: |
+          runids=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}"  ${{ env.GITHUB_API_PREFIX }}/actions/runs | \
+          jq -r '[.workflow_runs[]                                  | 
+            select(.status      =="waiting")                        | 
+            select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
+            select(.head_branch =="${{ env.BranchName }}")          | 
+            .id] | unique | join (" ")') ; \
+          echo "::set-output name=RUN_IDs::$runids"
+
+      - name: Cancel previous runs
+        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
+        run: |
+          for ID in ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
+          do
+            echo "Cancelling $ID ..."
+            curl -s -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" ${{ env.GITHUB_API_PREFIX }}/actions/runs/${ID}/cancel
+          done
+
+      #---------------------------------------------------------------------------------------------
+      # checkout code, retrieve artifact (=plan from previous job) and prepare terraform-environment
+      #---------------------------------------------------------------------------------------------
 
       - uses: actions/checkout@v2
 
@@ -184,8 +155,12 @@ jobs:
       - name: Terraform Apply
         run: terraform apply --auto-approve
 
-#      - name: Git Status
-#        run: (git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push); true
+      #--------
+      # cleanup
+      #--------
+
+      # - name: Git Status
+      #   run: (git status ;   git config --global user.email "marcus.brosda@gmx.de"; git config --global user.name "Marcus Brosda"; git add .terraform/terraform.tfstate; git commit -m 'new tfstate'; git push); true
 
       - name: Remove obsolete files from cache (will be cleaned up anyway)
         run: rm -rf plan.${{ env.PlanID }}.bin
