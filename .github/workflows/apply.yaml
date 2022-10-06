@@ -48,6 +48,20 @@ jobs:
             echo $ID
           done
 
+      - name: Cancel previous runs
+        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
+        run: |
+          for ID in ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
+          do
+            echo "Cancelling $ID ...""
+            curl -s -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" ${{ env.GITHUB_API_PREFIX }}/actions/runs/${ID}/cancel
+          done
+
+
+
+
+
+
 #      - name: Cancel Previous Runs
 #        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
 #        uses: styfle/cancel-workflow-action@0.10.1
