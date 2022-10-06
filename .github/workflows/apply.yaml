@@ -35,7 +35,7 @@ jobs:
           jq -r '[.workflow_runs[]                                  | 
             select(.status      =="waiting")                        | 
             select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
-            select(.head_branch =="main")               | 
+            select(.head_branch =="$GITHUB_REF_NAME")               | 
             .id] | join (",")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
