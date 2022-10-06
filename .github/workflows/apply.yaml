@@ -44,64 +44,66 @@ jobs:
         if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
         run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
 
-      - name: Cancel Previous Runs
-        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
-        uses: styfle/cancel-workflow-action@0.10.1
-        with:
-          access_token: "${{ github.token }}"
-          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}    # is the ID which relates to the workflow (e.g. 36437411 for .github/workflows/apply.yaml)
-                                                                         # all (previous) workflow RUNs with this workflow ID will be cancelled
+#      - name: Cancel Previous Runs
+#        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
+#        uses: styfle/cancel-workflow-action@0.10.1
+#        with:
+#          access_token: "${{ github.token }}"
+#          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}    # is the ID which relates to the workflow (e.g. 36437411 for .github/workflows/apply.yaml)
+#                                                                         # all (previous) workflow RUNs with this workflow ID will be cancelled
+#
+#          #workflow_id: all                                              # will cancel all the workflows running in the branch
+#          #ignore_sha: true
+#          #all_but_latest: true
+#
 
-          #workflow_id: all                                              # will cancel all the workflows running in the branch
-          #ignore_sha: true
-          #all_but_latest: true
 
-      #---------------
-      # initialize job
-      #---------------
-
-      - name: display IDs
-        run: |
-          echo "RUN_ID:     ${{ github.run_id }}"
-          echo "RUN_NUMBER: ${{ github.run_number }}"
-
-      - name: Cache Repo
-        id: cache-repo
-        uses: actions/cache@v3
-        with:
-          path: .
-          key: repo-cache
-
-      - uses: actions/checkout@v2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Terraform Init
-        run: terraform init
-
-       #------------------------------------------------------------------------------
-       # perform terraform plan, show result and store plan as artifact (for next job)
-       #------------------------------------------------------------------------------
-
-#      - name: Terraform Validate
-#        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -out=plan.${{ env.PlanID }}.bin
-
-      - name: Terraform Show Plan
-        run: terraform show plan.${{ env.PlanID }}.bin
-
-      - name: Store Plan and providers as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Terraform-Artifacts
-          path: |
-            plan.${{ env.PlanID }}.bin
- 
-      - name: Remove obsolete files from cache (will be cleaned up anyway)
-        run: rm -rf plan.${{ env.PlanID }}.bin
+#      #---------------
+#      # initialize job
+#      #---------------
+#
+#      - name: display IDs
+#        run: |
+#          echo "RUN_ID:     ${{ github.run_id }}"
+#          echo "RUN_NUMBER: ${{ github.run_number }}"
+#
+#      - name: Cache Repo
+#        id: cache-repo
+#        uses: actions/cache@v3
+#        with:
+#          path: .
+#          key: repo-cache
+#
+#      - uses: actions/checkout@v2
+#
+#      - name: Setup Terraform
+#        uses: hashicorp/setup-terraform@v1
+#
+#      - name: Terraform Init
+#        run: terraform init
+#
+#       #------------------------------------------------------------------------------
+#       # perform terraform plan, show result and store plan as artifact (for next job)
+#       #------------------------------------------------------------------------------
+#
+##      - name: Terraform Validate
+##        run: terraform validate
+#
+#      - name: Terraform Plan
+#        run: terraform plan -out=plan.${{ env.PlanID }}.bin
+#
+#      - name: Terraform Show Plan
+#        run: terraform show plan.${{ env.PlanID }}.bin
+#
+#      - name: Store Plan and providers as artifact
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: Terraform-Artifacts
+#          path: |
+#            plan.${{ env.PlanID }}.bin
+# 
+#      - name: Remove obsolete files from cache (will be cleaned up anyway)
+#        run: rm -rf plan.${{ env.PlanID }}.bin
 
   #---------------------------------------------------------------------------------------------------------
   # wait for approval (required for environment "deploy"), then perform tf apply
