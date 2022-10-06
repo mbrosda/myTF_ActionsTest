@@ -26,14 +26,15 @@ jobs:
       - name: Get IDs of previous runs
         id: previous-runs-ids
         run: |
-          runids=$(curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}"  ${{ env.GITHUB_API_PREFIX }}/actions/runs | \
+          runids=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}"  ${{ env.GITHUB_API_PREFIX }}/actions/runs | \
           jq -r '[.workflow_runs[] | select(.status=="waiting") | select(.head_branch=="main") | .id] | join (",")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
       - name: Print IDs of previous runs
+        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != "" }}
         run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
 
-#---------------
+      #---------------
       # initialize job
       #---------------
 
