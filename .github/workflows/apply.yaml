@@ -41,8 +41,15 @@ jobs:
           echo "::set-output name=RUN_IDs::$runids"
 
       - name: Print IDs of previous runs
-        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
+        if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
         run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.1
+        with:
+          access_token: "${{ github.token }}"
+          workflow_id: "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
+
 
       #---------------
       # initialize job
@@ -111,15 +118,6 @@ jobs:
       # cancel other job runs
       #----------------------
 
-      - name: Get IDs of previous runs
-        id: previous-runs-ids
-        run: |
-          runids=$(curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN"  $GITHUB_API_PREFIX/actions/runs | \
-          jq -r '[.workflow_runs[] | select(.status=="waiting") | select(.head_branch=="main") | .id] | join (",")') ; \
-          echo "::set-output name=RUN_IDs::$runids"
-
-      - name: Print IDs of previous runs
-        run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
 
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.10.1
