@@ -28,9 +28,9 @@ jobs:
         run: |
           runids=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}"  ${{ env.GITHUB_API_PREFIX }}/actions/runs | \
           jq -r '[.workflow_runs[] | \
-            select(.status       == "waiting") | \
-            select(.path         == ".github/workflows/apply.yaml") | \
-            select(.head_branch  == "main") | \
+            select(.status== "waiting") | \
+            select(.path== "apply.yaml") | \
+            select(.head_branch== "main") | \
             .id] | join (",")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
