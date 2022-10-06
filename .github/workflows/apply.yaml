@@ -1,6 +1,6 @@
 name: Terraform Apply
 
-on: [workflow_dispatch]
+on: [workflow_dispatch,push]
 
 env:
   ARM_CLIENT_ID:       ${{secrets.ARM_CLIENT_ID}}
@@ -48,7 +48,8 @@ jobs:
         uses: styfle/cancel-workflow-action@0.10.1
         with:
           access_token: "${{ github.token }}"
-          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
+          workflow_id: 3199484560
+          #workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
 
 
       #---------------
