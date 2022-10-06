@@ -37,7 +37,7 @@ jobs:
             select(.status      =="waiting")                        | 
             select(.path        =="${{ env.THIS_WORKFLOW_YAML}}")   | 
             select(.head_branch =="${{ env.BranchName }}")          | 
-            .id] | join (",")') ; \
+            .workflow_id] | join (",")') ; \
           echo "::set-output name=RUN_IDs::$runids"
 
       - name: Print IDs of previous runs
@@ -45,14 +45,17 @@ jobs:
         run: echo "${{ steps.previous-runs-ids.outputs.RUN_IDs }}"
 
       - name: Cancel Previous Runs
+        #if: ${{ steps.previous-runs-ids.outputs.RUN_IDs != '' }}
         uses: styfle/cancel-workflow-action@0.10.1
         with:
           access_token: "${{ github.token }}"
+          #workflow_id: all                                                # will cancel all the workflows running in the branch
+
+          #workflow_id: 3199484560                                        # for whatever reason doesn't work
+          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}    # for whatever reason doesn't work
+
           #ignore_sha: true
-          #workflow_id: 3199484560
           #all_but_latest: true
-          #workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}
-          workflow_id: all                                                # will cancel all the workflows running in the branch
 
 
       #---------------
