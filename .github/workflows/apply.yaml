@@ -49,14 +49,12 @@ jobs:
         uses: styfle/cancel-workflow-action@0.10.1
         with:
           access_token: "${{ github.token }}"
-          #workflow_id: all                                                # will cancel all the workflows running in the branch
+          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}    # is the ID which relates to the workflow (e.g. 36437411 for .github/workflows/apply.yaml)
+                                                                         # all (previous) workflow RUNs with this workflow ID will be cancelled
 
-          #workflow_id: 3199484560                                        # for whatever reason doesn't work
-          workflow_id: ${{ steps.previous-runs-ids.outputs.RUN_IDs }}    # for whatever reason doesn't work
-
+          #workflow_id: all                                              # will cancel all the workflows running in the branch
           #ignore_sha: true
           #all_but_latest: true
-
 
       #---------------
       # initialize job
